@@ -1,0 +1,31 @@
+# version: '3' -> obsoleto
+services:
+  pgsql-wallet:
+    image: postgres:16-alpine
+    ports:
+      # HOST:CONTAINER
+      - "5532:5532"
+    environment:
+      - POSTGRES_USER=pgsql-wallet-master
+      - POSTGRES_PASSWORD=pgsql-wallet-password
+    volumes:
+      - ./01-create-database.sql:/docker-entrypoint-initdb.d/01-create-database.sql
+
+    networks:
+      - backend 
+
+  pgadmin:
+    image: dpage/pgadmin4:9.3.0
+    ports:
+      - "8823:80"
+      - "8553:543"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=web@ufop.edu.br
+      - PGADMIN_DEFAULT_PASSWORD=123456
+
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
