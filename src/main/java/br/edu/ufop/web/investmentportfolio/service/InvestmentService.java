@@ -1,5 +1,8 @@
 package br.edu.ufop.web.investmentportfolio.service;
 
+import br.edu.ufop.web.investmentportfolio.converter.InvestmentConverter;
+import br.edu.ufop.web.investmentportfolio.domain.InvestmentDomain;
+import br.edu.ufop.web.investmentportfolio.domain.usecase.CreateInvestmentUseCase;
 import br.edu.ufop.web.investmentportfolio.dtos.InvestmentRequestDTO;
 import br.edu.ufop.web.investmentportfolio.dtos.InvestmentResponseDTO;
 import br.edu.ufop.web.investmentportfolio.dtos.InvestmentSummaryDTO;
@@ -8,7 +11,6 @@ import br.edu.ufop.web.investmentportfolio.exceptions.ResourceNotFoundException;
 import br.edu.ufop.web.investmentportfolio.models.Investment;
 import br.edu.ufop.web.investmentportfolio.repositories.InvestmentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,20 +28,25 @@ public class InvestmentService {
 
     @Transactional
     public InvestmentResponseDTO create(InvestmentRequestDTO requestDTO) {
-        Investment model = new Investment();
-        // Copia as propriedades do DTO para o Modelo
-        BeanUtils.copyProperties(requestDTO, model);
-        
+        // 1. Converter DTO para Domínio
+        InvestmentDomain domain = InvestmentConverter.toDomain(requestDTO);
+
+        // 2. Executar regras de negócio (UseCase)
+        new CreateInvestmentUseCase(domain).validate();
+
+        // 3. Converter Domínio para Modelo e salvar
+        Investment model = InvestmentConverter.toModel(domain);
         repository.save(model);
-        
-        return toResponseDTO(model);
+
+        // 4. Converter Modelo para DTO de resposta
+        return InvestmentConverter.toResponseDTO(model);
     }
 
     @Transactional(readOnly = true)
     public List<InvestmentResponseDTO> findAll(Optional<InvestmentType> type) {
         List<Investment> models = type.isPresent() ? repository.findByType(type.get()) : repository.findAll();
         return models.stream()
-                .map(this::toResponseDTO)
+                .map(InvestmentConverter::toResponseDTO) // Usando o Converter
                 .collect(Collectors.toList());
     }
 
@@ -47,18 +54,26 @@ public class InvestmentService {
     public InvestmentResponseDTO findById(Integer id) {
         Investment model = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ativo com ID " + id + " não encontrado."));
-        return toResponseDTO(model);
+        return InvestmentConverter.toResponseDTO(model); // Usando o Converter
     }
 
     @Transactional
     public InvestmentResponseDTO update(Integer id, InvestmentRequestDTO requestDTO) {
-        Investment model = repository.findById(id)
+        // Garante que o ativo existe antes de atualizar
+        Investment existingModel = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ativo com ID " + id + " não encontrado para atualização."));
         
-        BeanUtils.copyProperties(requestDTO, model);
-        repository.save(model);
+        // Converte o DTO para um objeto de domínio
+        InvestmentDomain domainToUpdate = InvestmentConverter.toDomain(requestDTO);
+        domainToUpdate.setId(id); // Seta o ID para garantir que é uma atualização
+
+        // Validações de atualização poderiam estar em um UpdateInvestmentUseCase
         
-        return toResponseDTO(model);
+        // Converte o domínio atualizado para o modelo e salva
+        Investment modelToUpdate = InvestmentConverter.toModel(domainToUpdate);
+        repository.save(modelToUpdate);
+        
+        return InvestmentConverter.toResponseDTO(modelToUpdate); // Usando o Converter
     }
 
     @Transactional
@@ -89,21 +104,8 @@ public class InvestmentService {
         InvestmentSummaryDTO summaryDTO = new InvestmentSummaryDTO();
         summaryDTO.setTotalInvested(totalInvested);
         summaryDTO.setTotalByType(totalByType);
-        summaryDTO.setAssetCount(investments.size());
+        summaryDTO.setAssetCount((long) investments.size());
         
         return summaryDTO;
-    }
-
-    // --- MÉTODOS PRIVADOS DE CONVERSÃO ---
-
-    private InvestmentResponseDTO toResponseDTO(Investment model) {
-        InvestmentResponseDTO responseDTO = new InvestmentResponseDTO();
-        BeanUtils.copyProperties(model, responseDTO);
-        
-        // Calcula o valor total
-        BigDecimal totalValue = model.getPurchasePrice().multiply(BigDecimal.valueOf(model.getQuantity()));
-        responseDTO.setTotalValue(totalValue);
-        
-        return responseDTO;
     }
 }

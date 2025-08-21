@@ -1,0 +1,56 @@
+# Variáveis para o ambiente local
+@baseUrl = http://localhost:8080/investments
+@investmentId = 1
+
+### Cadastrar um novo ativo (Ação)
+# @name createAcao
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "type": "ACAO",
+  "symbol": "BBAS3",
+  "quantity": 100,
+  "purchasePrice": 19.68,
+  "purchaseDate": "2023-10-25"
+}
+
+### Cadastrar um novo ativo (Cripto)
+# @name createCripto
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "type": "CRIPTO",
+  "symbol": "BTC",
+  "quantity": 1,
+  "purchasePrice": 150000.00,
+  "purchaseDate": "2024-01-10"
+}
+
+### Listar todos os ativos da carteira
+GET {{baseUrl}}
+
+### Filtrar ativos por tipo (CRIPTO)
+GET {{baseUrl}}?type=CRIPTO
+
+### Buscar um ativo por ID
+GET {{baseUrl}}/{{investmentId}}
+
+### Atualizar um ativo
+PUT {{baseUrl}}/{{investmentId}}
+Content-Type: application/json
+
+{
+  "type": "ACAO",
+  "symbol": "BBAS3",
+  "quantity": 150,
+  "purchasePrice": 25.50,
+  "purchaseDate": "2024-02-20"
+}
+
+### Remover um ativo da carteira
+DELETE {{baseUrl}}/{{investmentId}}
+
+### Resumo da carteira
+GET {{baseUrl}}/summary

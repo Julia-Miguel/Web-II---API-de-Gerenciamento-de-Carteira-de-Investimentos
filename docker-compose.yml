@@ -3,13 +3,12 @@ services:
   pgsql-wallet:
     image: postgres:16-alpine
     ports:
-      # HOST:CONTAINER
-      - "5532:5532"
+      - "5532:5432"
     environment:
       - POSTGRES_USER=pgsql-wallet-master
       - POSTGRES_PASSWORD=pgsql-wallet-password
     volumes:
-      - ./01-create-database.sql:/docker-entrypoint-initdb.d/01-create-database.sql
+      - ./create-database.sql:/docker-entrypoint-initdb.d/create-database.sql
 
     networks:
       - backend 

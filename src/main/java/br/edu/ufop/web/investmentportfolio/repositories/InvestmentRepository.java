@@ -7,11 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-/**
- * Interface de repositório para a entidade Investment.
- */
 @Repository
-public interface InvestmentRepository extends JpaRepository<Investment, Long> {
+public interface InvestmentRepository extends JpaRepository<Investment, Integer> { // Alterado de Long para Integer
 
     List<Investment> findByType(InvestmentType type);
 }
