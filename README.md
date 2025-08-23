@@ -4,7 +4,7 @@ Este é um projeto full-stack de uma API para gerenciamento de carteira de inves
 
 A aplicação é dividida em um **Backend** robusto construído com Java e Spring Boot, e um **Frontend** moderno e interativo desenvolvido com React e TypeScript.
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 * **CRUD completo de Ativos:**
     * Cadastrar novos investimentos (Ações, Criptos, Fundos, etc.).
@@ -17,7 +17,7 @@ A aplicação é dividida em um **Backend** robusto construído com Java e Sprin
 * **Interface Reativa:** Frontend moderno com uma experiência de usuário fluida.
 * **Tema Claro/Escuro:** Botão para alternar o tema da interface.
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 O projeto utiliza uma stack de tecnologias modernas e populares no mercado.
 
@@ -39,7 +39,7 @@ O projeto utiliza uma stack de tecnologias modernas e populares no mercado.
 * **React Router DOM** (para navegação)
 * **Bootstrap** (para estilização)
 
-## 🚀 Como Executar o Projeto
+## Como Executar o Projeto
 
 Para executar este projeto em sua máquina local, siga os passos abaixo.
 
